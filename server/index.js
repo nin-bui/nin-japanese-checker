@@ -1,44 +1,44 @@
 const express = require('express');
 const cors = require('cors');
-const fs = require('fs');
+const { loadGrammar, checkGrammar } = require('./api/v1/grammar/grammarChecker');
 
 const app = express();
 app.use(cors());
 app.use(express.json());
 
-// Load grammar patterns from JSON file
-let grammarPatterns = [];
+// Load patterns khi server khởi động
+const grammarPatterns = loadGrammar();
 
-try {
-  const rawData = fs.readFileSync('./grammar.json', 'utf-8');
-  const rawPatterns = JSON.parse(rawData);
-
-  // Convert pattern string → RegExp
-  grammarPatterns = rawPatterns.map(item => ({
-    ...item,
-    regex: new RegExp(item.pattern)
-  }));
-
-  console.log(`Loaded ${grammarPatterns.length} grammar patterns.`);
-} catch (err) {
-  console.error('Failed to load grammar patterns:', err);
-}
-
-// API endpoint
-app.post('/check', (req, res) => {
+// API kiểm tra ngữ pháp
+app.post('/api/v1/grammar/check', (req, res) => {
   const { text } = req.body;
-  if (!text) {
-    return res.status(400).json({ error: 'No text provided.' });
+  if (!text || typeof text !== 'string') {
+    return res.status(400).json({ error: 'Invalid text input.' });
   }
 
-  console.log(`Received text: ${text}`);
+  const result = checkGrammar(text, grammarPatterns);
+  res.json(result);
+});
 
-  const matches = grammarPatterns.filter(item => item.regex.test(text));
+// API trả về danh sách ngữ pháp theo cấp độ
+app.get('/api/v1/grammar/by-level', (req, res) => {
+  const grouped = {};
 
-  res.json({ results: matches });
+  for (const item of grammarPatterns) {
+    const level = item.level || 'Unknown';
+    if (!grouped[level]) grouped[level] = [];
+    grouped[level].push({
+      name: item.name,
+      meaning: item.meaning,
+      example: item.example,
+      structure: item.structure
+    });
+  }
+
+  res.json(grouped);
 });
 
 // Start server
 app.listen(3001, () => {
-  console.log('Server running on http://localhost:3001');
+  console.log('Server is running at http://localhost:3001');
 });
