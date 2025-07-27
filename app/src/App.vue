@@ -1,12 +1,14 @@
 <template>
   <div class="p-4 max-w-xl mx-auto">
     <h1 class="text-xl font-bold mb-4">Japanese Grammar Checker</h1>
+
     <textarea
       v-model="text"
       rows="4"
       class="w-full p-2 border rounded"
       placeholder="Nhập câu tiếng Nhật..."
     ></textarea>
+
     <button
       @click="checkGrammar"
       class="mt-2 bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
@@ -19,7 +21,7 @@
     <div v-if="result">
       <h2 class="mt-4 font-semibold">Kết quả:</h2>
 
-      <!-- Kết quả chính xác -->
+      <!-- ✅ Khớp chính xác -->
       <div v-if="result.matched.length">
         <ul class="mt-2 list-disc pl-5">
           <li v-for="(item, index) in result.matched" :key="index">
@@ -29,19 +31,19 @@
         </ul>
       </div>
 
-      <!-- Không khớp chính xác -->
+      <!-- ❌ Không khớp -->
       <div v-else class="text-red-600 mt-2">
         {{ result.suggestion }}
       </div>
 
-      <!-- Gợi ý gần đúng -->
-      <div v-if="result.fuzzy && result.fuzzy.length" class="mt-4">
+      <!-- 🟡 Gợi ý gần đúng -->
+      <div v-if="result.fuzzySuggestions && result.fuzzySuggestions.length" class="mt-4">
         <h3 class="font-semibold text-gray-800">Gợi ý gần đúng:</h3>
         <ul class="mt-2 list-disc pl-5">
-          <li v-for="(item, index) in result.fuzzy" :key="'fuzzy-' + index">
-            <strong>{{ item.name }}</strong> ({{ item.level }}) - {{ item.meaning }}
-            <div class="text-sm text-gray-600">Mẫu: {{ item.structure }}</div>
-            <div class="text-xs text-gray-500">Nguồn: {{ item.source }}</div>
+          <li v-for="(item, index) in result.fuzzySuggestions" :key="'fuzzy-' + index">
+            <strong>{{ item.name }}</strong> ({{ item.level }})
+            <div class="text-sm text-gray-600">Ví dụ: {{ item.example }}</div>
+            <div class="text-xs text-gray-500">{{ item.fixHint }}</div>
           </li>
         </ul>
       </div>
@@ -60,6 +62,7 @@ const loading = ref(false)
 const checkGrammar = async () => {
   loading.value = true
   result.value = null
+
   try {
     const res = await axios.post('http://localhost:3001/api/v1/grammar/check', { text: text.value })
     result.value = res.data
@@ -71,16 +74,6 @@ const checkGrammar = async () => {
   }
 }
 </script>
-
-<style scoped>
-textarea {
-  font-size: 16px;
-}
-button {
-  font-size: 16px;
-}
-</style>
-
 
 
 <style scoped>
