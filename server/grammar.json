@@ -1,0 +1,63 @@
+[
+    {
+        "name": "〜より〜のほうが",
+        "level": "N5",
+        "meaning": "So với... thì ... hơn",
+        "example": "犬より猫のほうが好きです。",
+        "pattern": "より.*のほうが",
+        "structure": "N1よりN2のほうが",
+        "note": "So sánh giữa hai đối tượng.",
+        "source": "JLPT N5"
+    },
+    {
+        "name": "〜より〜ほうが",
+        "level": "N5",
+        "meaning": "So với A thì B hơn",
+        "example": "バスより電車のほうが早いです。",
+        "pattern": "より.*ほうが",
+        "structure": "N1よりN2ほうが",
+        "note": "Có thể lược bỏ の giữa N và ほうが.",
+        "source": "JLPT N5"
+    },
+    {
+        "name": "〜より〜の方が",
+        "level": "N4",
+        "meaning": "B thì hơn A (dùng khi so sánh)",
+        "example": "彼より田中さんの方が背が高いです。",
+        "pattern": "より.*の方が",
+        "structure": "N1よりN2の方が",
+        "note": "Có thể dùng 方 thay cho ほう.",
+        "source": "JLPT N4"
+    },
+    {
+        "name": "〜よりも",
+        "level": "N3",
+        "meaning": "Cách nói nhấn mạnh hơn của より",
+        "example": "今日よりも明日の方が寒いでしょう。",
+        "pattern": "よりも",
+        "structure": "Nよりも",
+        "note": "Dùng khi muốn nhấn mạnh so sánh.",
+        "source": "JLPT N3"
+    },
+    {
+        "name": "〜というより",
+        "level": "N2",
+        "meaning": "Nói đúng hơn là...",
+        "example": "彼は歌手というより俳優だ。",
+        "pattern": "というより",
+        "structure": "AというよりB",
+        "note": "Diễn tả B đúng hơn là A.",
+        "source": "JLPT N2"
+    },
+    {
+        "name": "〜というよりむしろ",
+        "level": "N1",
+        "meaning": "Nói đúng hơn là, đúng hơn phải nói là",
+        "example": "彼は天才というよりむしろ変人だ。",
+        "pattern": "というよりむしろ",
+        "structure": "AというよりむしろB",
+        "note": "Dùng để phủ định nhẹ nhàng A và nhấn mạnh B.",
+        "source": "JLPT N1"
+    }
+      
+]
