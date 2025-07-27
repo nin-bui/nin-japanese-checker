@@ -17,6 +17,9 @@ app.post('/api/v1/grammar/check', async (req, res) => {
 
   const result = checkGrammar(text, grammarPatterns);
 
+  console.log("result", result);
+  
+
   // Nếu không khớp, dùng fuzzy
   if (result.matched.length === 0) {
     const fuzzy = await analyzeFuzzyGrammar(text, grammarPatterns);

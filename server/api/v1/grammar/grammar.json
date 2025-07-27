@@ -10,15 +10,16 @@
         "source": "JLPT N5"
     },
     {
-        "name": "〜より〜ほうが",
+        "name": "～より～のほうが～",
+        "structure": "AよりBのほうが～",
+        "normalize": [
+          { "pattern": "([\\p{Script=Han}\\p{Script=Hiragana}\\p{Script=Katakana}a-zA-Z0-9]+)より", "replacement": "Aより" },
+          { "pattern": "より([\\p{Script=Han}\\p{Script=Hiragana}\\p{Script=Katakana}a-zA-Z0-9]+)のほう", "replacement": "よりBのほう" }
+        ],
+        "meaning": "... thì ... hơn ...",
         "level": "N5",
-        "meaning": "So với A thì B hơn",
-        "example": "バスより電車のほうが早いです。",
-        "pattern": "より.*ほうが",
-        "structure": "N1よりN2ほうが",
-        "note": "Có thể lược bỏ の giữa N và ほうが.",
-        "source": "JLPT N5"
-    },
+        "example": "バスより電車のほうが早いです"
+      },
     {
         "name": "〜より〜の方が",
         "level": "N4",

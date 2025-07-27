@@ -12,6 +12,7 @@
   "dependencies": {
     "cors": "^2.8.5",
     "express": "^5.1.0",
+    "js-levenshtein": "^1.1.6",
     "kuromoji": "^0.1.2",
     "string-similarity": "^4.0.4"
   }

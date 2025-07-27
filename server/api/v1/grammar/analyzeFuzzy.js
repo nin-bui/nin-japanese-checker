@@ -1,63 +1,58 @@
-const kuromoji = require('kuromoji');
-const path = require('path');
-const builder = kuromoji.builder({ dicPath: 'node_modules/kuromoji/dict' });
+const levenshtein = require('js-levenshtein')
+const kuromoji = require('kuromoji')
+const grammarList = require('../grammar/grammar.json')
 
-let tokenizerInstance = null;
+const tokenizerPromise = new Promise((resolve, reject) => {
+  kuromoji.builder({ dicPath: 'node_modules/kuromoji/dict' }).build((err, tokenizer) => {
+    if (err) reject(err)
+    else resolve(tokenizer)
+  })
+})
 
-// Load tokenizer 1 lần
-builder.build((err, tokenizer) => {
-  if (err) throw err;
-  tokenizerInstance = tokenizer;
-});
+function normalizeByRules(text, rules = []) {
+  let result = text
+  for (const { pattern, replacement } of rules) {
+    try {
+      const regex = new RegExp(pattern, 'gu') // Unicode-aware
+      result = result.replace(regex, replacement)
+    } catch (e) {
+      console.error('Invalid normalize pattern:', pattern, e)
+    }
+  }
+  return result
+}
 
-async function analyzeFuzzyGrammar(text, grammarPatterns) {
-  if (!tokenizerInstance) throw new Error('Tokenizer chưa sẵn sàng');
+async function analyzeFuzzyGrammar(inputText, fuzzyThreshold = 4) {
+  const tokenizer = await tokenizerPromise
+  const tokens = tokenizer.tokenize(inputText)
+  const tokenizedText = tokens.map(token => token.surface_form).join('')
 
-  const tokens = tokenizerInstance.tokenize(text);
-  const surfaceText = tokens.map(t => t.surface_form).join('');
+  const fuzzyMatches = []
 
-  const suggestions = [];
+  for (const pattern of grammarList) {
+    const normalizeRules = pattern.normalize || []
 
-  for (const pattern of grammarPatterns) {
-    const regex = new RegExp(pattern.pattern);
-    const distance = levenshteinDistance(surfaceText, pattern.example.replace(/[^\u3040-\u30FF\u4E00-\u9FAF]/g, ''));
+    const normalizedInput = normalizeByRules(tokenizedText, normalizeRules)
+    const normalizedStructure = normalizeByRules(pattern.structure, normalizeRules)
 
-    if (!regex.test(text) && distance <= 2) {
-      suggestions.push({
-        name: pattern.name,
-        level: pattern.level,
-        example: pattern.example,
-        fixHint: `Câu của bạn có thể gần đúng với: ${pattern.example}`
-      });
+    const distance = levenshtein(normalizedInput, normalizedStructure)
+
+    if (distance <= fuzzyThreshold) {
+      fuzzyMatches.push({
+        ...pattern,
+        structure: normalizedStructure,
+        distance,
+        source: 'normalized fuzzy'
+      })
     }
   }
 
-  return {
-    input: text,
-    suggestions: suggestions.slice(0, 3)
-  };
+  // Sắp xếp theo độ tương đồng tăng dần
+  fuzzyMatches.sort((a, b) => a.distance - b.distance)
+
+  return fuzzyMatches
 }
 
-// Hàm tính khoảng cách Levenshtein
-function levenshteinDistance(a, b) {
-  const matrix = Array(a.length + 1).fill(null).map(() =>
-    Array(b.length + 1).fill(null));
-
-  for (let i = 0; i <= a.length; i++) matrix[i][0] = i;
-  for (let j = 0; j <= b.length; j++) matrix[0][j] = j;
-
-  for (let i = 1; i <= a.length; i++) {
-    for (let j = 1; j <= b.length; j++) {
-      const cost = a[i - 1] === b[j - 1] ? 0 : 1;
-      matrix[i][j] = Math.min(
-        matrix[i - 1][j] + 1,
-        matrix[i][j - 1] + 1,
-        matrix[i - 1][j - 1] + cost
-      );
-    }
-  }
-
-  return matrix[a.length][b.length];
+module.exports = {
+  analyzeFuzzyGrammar
 }
-
-module.exports = { analyzeFuzzyGrammar };
