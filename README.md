@@ -1,0 +1,1 @@
+# nin-japanese-checker
